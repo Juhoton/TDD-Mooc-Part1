@@ -97,7 +97,6 @@ function createApp(database) {
   }
 
   function convertDate(date) {
-    if (date === Temporal.PlainDate) return date
     return date.toTemporalInstant().toZonedDateTimeISO("UTC").toPlainDate();
   } // temp date to temporalDate convert
 
