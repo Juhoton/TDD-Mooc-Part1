@@ -87,7 +87,7 @@ function createApp(database) {
       let holiday = new Date(row.holiday);
       if (
         date &&
-        date2.year === convertDate(holiday).year &&
+        date.year === convertDate(holiday).year &&
         date2.month === convertDate(holiday).month &&
         date2.day === convertDate(holiday).day
       ) {
