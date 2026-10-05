@@ -96,7 +96,7 @@ function createApp(database) {
   }
 
   function convertDate(date) {
-    return Temporal.PlainDate.from(date.toString);
+    return Temporal.PlainDate.from(date.toISOString);
   } // temp date to temporalDate convert
 
   return app;
