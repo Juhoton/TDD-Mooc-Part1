@@ -96,7 +96,8 @@ function createApp(database) {
   }
 
   function convert(date) {
-    } // temp date to temporalDate convert
+
+  } // temp date to temporalDate convert
 
   return app;
 }
