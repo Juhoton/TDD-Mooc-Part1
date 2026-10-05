@@ -98,7 +98,6 @@ function createApp(database) {
   }
 
   function convertDate(date) {
-    console.log(typeof date);
     return date.toTemporalInstant().toZonedDateTimeISO("UTC").toPlainDate();
   } // temp date to temporalDate convert
 
