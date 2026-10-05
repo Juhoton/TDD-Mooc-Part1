@@ -76,6 +76,7 @@ function createApp(database) {
   }
 
   function isMonday(date) {
+    console.log("Date: ",date);
     return date.getUTCDay() === 1;
   }
 
