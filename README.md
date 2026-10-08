@@ -1,134 +1,24 @@
-# [TDD MOOC](https://tdd.mooc.fi): Small, safe steps
+# [TDD MOOC Exercise 1](https://tdd.mooc.fi): Small, safe steps
 
-This is a refactoring exercise to practise doing small, safe steps.
+Refactoring exercise about converting the usage of JS Date to Temporal.PlainDate. The main focus was to do the refactoring with incremental steps, meaning only changing 1-3 lines at a time, and getting the test pass. 
 
-**Refactor the code in [src/prices.mjs](src/prices.mjs) to replace all usages of
-the [Date](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date) class with
-the [Temporal.PlainDate](https://tc39.es/proposal-temporal/docs/plaindate.html) class.**
+## First attempt, Parallel Changes (Branch 404)
 
-Alternatively you may refactor the statically typed version: [src/prices_typed.ts](src/prices_typed.ts)
+The attempt took slightly over an hour. It took some time getting back to coding, and some reading about the Date and Temporal.PlainDate. The parallel changes refactoring method was easy to understand and use. Using temp names like date2 left convenient markers for changes, that made it easy to know what functions were refactored and what weren't. In the process of resetting the exercise for an another attempt, I accidentally removed the logs for the attempt, so there's no record of this attempt.
 
-(In [test/date_conversion.spec.mjs](test/date_conversion.spec.mjs) there are learning tests about using the Temporal
-API.)
+## Second Attempt, Conversion Propagation, TCR Max Changes 2 (Branch Refactor2)
 
-Repeat this refactoring many times.
+This method took some time to understand, but was easy to use after that. I made a temp conversion function, that then made it possible to refactor the functions from the bottom up, each time pushing the conversion function call further up. 
 
-Focus on doing as small changes as possible, so that all the tests will pass between every change. Make it your goal to
-change at most _2 lines_ at a time. It's even possible to do this refactoring by changing only _1 line_ at a time,
-though that will require some unconventional refactoring strategies and good familiarity with JavaScript, because then
-you can no longer change a function signature and all calls to that function at the same time. (In real life, changing
-1-3 lines at a time is normal.)
+The max changes 2 limit mostly made me do some weird steps with the code, like opening a function had to be done in steps. It also made it necessary to modify the temp conversion function to return the date value back if it was already converted to the Temporal.PlainDate. A better way to do it was probably to make it check if the given value was Date object, and either convert it if it was, or return it if it wasn't. I'm not sure if the limit making me realize the need for that and making me do the modification was a good thing --- especially when talking about a temp function --- but I probably wouldn't have done it if it wasn't there. 
 
-Try out different approaches. For example refactor starting from where the `Date` value is created vs. where it is used.
-You may also try copying a function, changing the new function, and then migrating all code to use it one-by-one,
-instead of changing an existing function.
+The TCR was an interesting way to code, but I feel like it just made me rewrite the same lines more often than actually help. I do like the autotesting feature, where with every change I can just quickly check if anything breaks. The forced revert however just feel like it breaks the workflow more than help. It does force you to do incremental steps, but if you can have the discipline to do it on your own, the reverting just feels unnecessary. 
 
-Get to know your IDE and the automated refactorings it provides.
-Try [refactoring golf](https://github.com/daviddenton/refactoring-golf#readme) and get the lowest score possible.
+## Third Attempt, Parallel Changes, TCR Max Changes 1 (Branch Main)
 
-## When is a change small?
+This was more of a challenge than a real method to follow. The parallel function for the new parseDate method had to be written in a single line, which feels illegal. The challenge does force you to think in different ways than normal, so there's some benefit. It also forces you to write one liners, so it's a good way to learn about those. 
 
-Whether a change is big or small, is not always proportional to its diff size. What matters is the locality of the
-change. Real applications contain more code than is feasible to read and keep in your head. Thus while refactoring, you
-should minimize the amount of information that needs to be kept in your head.
 
-A change is small when just by looking at a local change (e.g. the code within a single function) you can prove that it
-doesn't break any code elsewhere in the system.
-
-Such changes can be made mechanically in a second or two, without much thinking, so you can quickly do lots of them.
-Running all tests between every change, you'll find out immediately if you broke something, so fixing it is easy and
-quick. Often the fastest fix is to just undo the failed change and try again, but with even smaller steps.
-
-With good support for automated refactorings in your IDE, it can expand the range of safe moves. For example, it may
-allow changing a function signature and all calls to that function in a single step.
-
-### Example: parallel change
-
-One very common refactoring strategy is to have the new and old code exist side-by-side, until all code has been
-migrated to use the new code, and the old code can be removed.
-
-(It works also for entire systems, such as the change from [NMT](https://en.wikipedia.org/wiki/Nordic_Mobile_Telephone)
-to [GSM](https://en.wikipedia.org/wiki/GSM) networks. And lots of public sector IT projects fail because of doing a big
-bang release instead of parallel change.)
-
-For example, start from where the old value is produced, create the new value there, and pass it side-by-side with the
-old value deeper down the call chain.
-
-Example:
-
-```js
-const date = parseDate(req.query.date);
-const cost = calculateCost(age, type, date, baseCost);
-```
-
-Add the new `date2` variable and pass it to every function that takes the old `date` variable:
-
-```js
-const date = parseDate(req.query.date);
-const date2 = parsePlainDate(req.query.date);
-const cost = calculateCost(age, type, date, baseCost, date2);
-```
-
-Next go inside the `calculateCost` function, change it to use `date2`, and forward the variable to the next level of
-functions. Repeat until every function has been migrated use `date2`.
-
-This refactoring strategy is demonstrated at https://youtu.be/MMAXNUCPMBw
-
-### Example: conversion propagation
-
-Another refactoring strategy is to create a migration boundary at one edge of the codebase, and push the migration
-incrementally through the whole codebase. This works when the old value contains all data necessary for producing the
-new value. (There's no official name for this refactoring, so let's call it _conversion propagation_ for now.)
-
-For example, start where the old value is used, and convert it to the new value right before using it. Push the
-conversion up the call stack one function at a time, until you reach where the old value was originally created.
-
-Example:
-
-```js
-function isMonday(date) {
-  return date.getDay() === 1;
-}
-```
-
-Migrate the lowest level function to use the converted value:
-
-```js
-function isMonday(date) {
-  return convert(date).dayOfWeek === 1;
-}
-```
-
-Then do the [extract parameter](https://www.jetbrains.com/help/idea/extract-parameter.html) refactoring and push the
-conversion to the caller of `isMonday`. The call site changes from `isMonday(date)` to `isMonday(convert(date))` and the
-function now takes the new value as a parameter:
-
-```js
-function isMonday(date) {
-  return date.dayOfWeek === 1;
-}
-```
-
-Repeat for each function, until the conversion has propagated up to the place where the old value is produced and you
-can produce the new value there directly.
-
-This refactoring strategy is demonstrated at https://youtu.be/5jXgXip5LhA
-
-## TCR challenge
-
-If you set the environment variable `MAX_CHANGES` to `1` or higher, the tests will automatically check with Git that at
-most that many lines have been modified.
-
-This can be combined with
-[test && commit || revert](https://medium.com/@kentbeck_7670/test-commit-revert-870bbd756864) (TCR):
-
-Use the `npm run tcr` command to commit or revert the changes automatically depending on whether the tests passed.
-
-By default the `npm run tcr` command sets `MAX_CHANGES=2`. To increase the difficulty, you can use the
-command: `MAX_CHANGES=1 npm run tcr` (Mac/Linux).
-
-If your editor runs [Prettier](https://prettier.io/) automatically on save, you might want to disable it to avoid
-accidentally changed lines.
 
 ---
 
