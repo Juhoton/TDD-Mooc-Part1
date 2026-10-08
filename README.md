@@ -16,9 +16,7 @@ The TCR was an interesting way to code, but I feel like it just made me rewrite 
 
 ## Third Attempt, Parallel Changes, TCR Max Changes 1 (Branch Main)
 
-This was more of a challenge than a real method to follow. The parallel function for the new parseDate method had to be written in a single line, which feels illegal. The challenge does force you to think in different ways than normal, so there's some benefit. It also forces you to write one liners, so it's a good way to learn about those. 
-
-
+This was more of a challenge than a real method to follow. The parallel function for the new parseDate method had to be written in a single line, which feels illegal. The challenge does force you to think in different ways than normal, so there's some benefit. It also forces you to write one liners, so it's a good way to learn about those.
 
 ---
 
